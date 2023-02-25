@@ -1,0 +1,45 @@
+{
+  "name": "ensword",
+  "version": "1.0.0",
+  "main": "dist-electron/main/index.js",
+  "description": "Integrate mdict into youtube, use for english learning.",
+  "author": "rohye <rohy.froze@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "debug": {
+    "env": {
+      "VITE_DEV_SERVER_URL": "http://127.0.0.1:7777/"
+    }
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build && electron-builder",
+    "preview": "vite preview",
+    "e2e": "npx playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.29.2",
+    "@types/react": "^18.0.27",
+    "@types/react-dom": "^18.0.10",
+    "@vitejs/plugin-react": "^3.0.1",
+    "electron": "^22.0.3",
+    "electron-builder": "^23.6.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "sass": "^1.57.1",
+    "typescript": "^4.9.4",
+    "vite": "^4.0.4",
+    "vite-electron-plugin": "^0.7.4",
+    "vite-plugin-commonjs": "^0.6.1",
+    "vite-plugin-electron-renderer": "^0.11.4"
+  },
+  "engines": {
+    "node": "^14.18.0 || >=16.0.0"
+  },
+  "dependencies": {
+    "@ant-design/icons": "^5.0.1",
+    "antd": "^5.2.2",
+    "cheerio": "^1.0.0-rc.12",
+    "jsdom": "^21.1.0"
+  }
+}
