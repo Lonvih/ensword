@@ -35,13 +35,16 @@ function App() {
     }
   }, []);
 
-  function saveFilesInCache(files: DictFile[]) {
-    const newFiles = files.map((f) => ({
+  function formatFileList(files: DictFile[]) {
+    return files.map((f) => ({
       uid: f.uid,
       name: f.name,
       path: f.path,
     }));
-    window.localStorage.setItem("__files__", JSON.stringify(newFiles));
+  }
+
+  function saveFilesInCache(files: DictFile[]) {
+    window.localStorage.setItem("__files__", JSON.stringify(formatFileList(files)));
   }
 
   function loadYouTuBe() {
@@ -49,6 +52,7 @@ function App() {
       message.error("Please load mdict files first.")
       return;
     }
+    // console.log('fileList: ', fileList);
     ipcRenderer.send("loadYouTuBe", fileList)
   }
 
@@ -60,7 +64,7 @@ function App() {
     showUploadList: false,
     beforeUpload(file, files) {
       saveFilesInCache(files)
-      setFileList(files);
+      setFileList(formatFileList(files));
       return false;
     },
   };
