@@ -176,7 +176,7 @@ export default function createRenderer(resources) {
           console.log("lookup done!");
           var html = definitions.reduce(function (prev, txt) {
             return prev + "<p></p>" + txt;
-          }, "<p>" + definitions.length + " entry(ies) </p>");
+          }, "");
           // return html
           return Promise.resolve(render(window.__jquery("<div>").html(html)));
         });

@@ -199,6 +199,10 @@ function appendSubtitlesContainer(data2String) {
       transform-origin: left center;
     }
 
+    .__whole_subtitles div span:first-child{
+      cursor: pointer;
+    }
+
     #__definition__ {
       position: absolute;
       top: calc(100% + 8px);
@@ -214,7 +218,7 @@ function appendSubtitlesContainer(data2String) {
     }
   </style>
   <img src="https://www.webwise.ie/wp-content/uploads/2014/04/Slider8.jpg" class="__extension_icon" />
-  <div class="__video_subitles __video_subitles--hidden">
+  <div class="__video_subitles">
     <div class="__subtitles_head">
       <img src="https://s1.ax1x.com/2022/11/14/zA2N38.png" alt="prev" />
       <img src="https://s1.ax1x.com/2022/11/14/zA20Bj.png" alt="next" />

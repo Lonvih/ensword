@@ -65,8 +65,10 @@ async function createWindow(targetUrl?: string) {
     // win.loadURL('https://www.youtube.com')
     // Open devTool if the app is not packaged
     win.webContents.openDevTools()
+  } else if (targetUrl) {
+    win.loadURL(targetUrl)
   } else {
-    win.loadFile(targetUrl || indexHtml)
+    win.loadFile(indexHtml)
   }
 
   // const view = new BrowserView()

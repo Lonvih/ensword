@@ -1,7 +1,7 @@
 import MParser from "../main/mdict/mdict-parser.js";
 import MRenderer from "../main/mdict/mdict-renderer";
 import jquery from "../main/mdict/jquery.js";
-import { ipcRenderer } from 'electron'
+import { ipcRenderer } from "electron";
 
 let isControllerInit = false;
 class Queue {
@@ -219,7 +219,7 @@ export default function () {
     // console.log('videoEl === video: ', videoEl === video);
     if (videoEl === video) return;
     videoEl = video;
-    videoEl.removeEventListener('timeupdate', videoListenerFn)
+    videoEl.removeEventListener("timeupdate", videoListenerFn);
     videoEl.addEventListener("timeupdate", videoListenerFn);
   }
 
@@ -251,8 +251,10 @@ export default function () {
         let isQuote = false;
         let num = 0;
         let total = 0;
+        const DIV_PREFIX =
+          "<div class='__subtitle_sentence__'><span class='__sentence_count__'>${num}/${total}</span>";
         let wholeSubtitleText = subtitleData
-          .map((item) => {
+          .map((item, index) => {
             const { segs = [] } = item;
             let t = segs[0] && segs[0].utf8;
             const matchWordReg = /([a-zA-Z\-]+)/gi;
@@ -269,10 +271,11 @@ export default function () {
             // } else if (/[“"]/.test(t) && !/”/.test(t) && (t.match(/[“"]/g).length % 2) > 0) {
             //   isQuote = true;
             // }
-            let sentenceEndReg = /(\w(?<!Mr))(<\/word>)(\.|\!|\?)("?)([^\d])/gi;
+            let sentenceEndReg =
+              /(\w(?<!Mr))(<\/word>)?(\.{1,}|\!|\?)("?)([^\d\<]?)/gi;
             const r = t.replace(
               sentenceEndReg,
-              "$1$2$3$4$5</div><div><span>${num}/${total}</span>"
+              `$1$2$3$4$5</div>${DIV_PREFIX}`
             );
             // const isLastSentence = /\w\.?(\.|\!|\?|”|")$/i.test(t);
             // if (isLastSentence && !isQuote) {
@@ -284,6 +287,9 @@ export default function () {
             return r;
           })
           .join(" ");
+        if (wholeSubtitleText) {
+          wholeSubtitleText = DIV_PREFIX + wholeSubtitleText;
+        }
         const m = wholeSubtitleText.match(/\${num}/g);
         if (m) {
           for (let i = 0; i < m.length; i++) {
@@ -322,24 +328,6 @@ export default function () {
     displayWholeSubtitleIcon.onclick = displayWholeSubtitleIndividual;
   }
 
-  function handleDictInputListener() {
-    const fileInput = window.__jquery("#dictfile");
-    if (fileInput) {
-      fileInput[0].onchange = (e) => {
-        const fileList = e.target.files;
-
-        if (fileList.length > 0) {
-          MParser(fileList).then(function (resources) {
-            console.log("<--------- dict parse success --------->");
-            // console.log('resources: ', resources);
-            mdict = MRenderer(resources);
-            // setMdict(mdict)
-          });
-        }
-      };
-    }
-  }
-
   function initDictData(fileList) {
     if (fileList.length > 0) {
       MParser(fileList).then(function (resources) {
@@ -365,10 +353,45 @@ export default function () {
     el.style["min-height"] = youtubeContainer.getBoundingClientRect().height;
   }
 
+  function translateByGoogle(str) {
+    fetch(
+      `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=zh-CN&dt=t&dj=1&q=${str}`
+    ).then(async (res) => {
+      const data = await res.json();
+      if (data && data.sentences) {
+        const transSentence = data.sentences[0];
+        const trans = transSentence && transSentence.trans;
+        renderTransSentence(str, trans);
+      }
+    });
+  }
+
+  function renderTransSentence(originStr, transStr) {
+    const originDiv = document.createElement("div");
+    const transDiv = document.createElement("div");
+    originDiv.innerHTML = originStr;
+    transDiv.innerHTML = transStr;
+    originDiv.style =
+      "font-size: 14px; font-style: italic; margin-bottom: 8px;";
+    transDiv.style = "font-size: 16px; font-weight: bold;";
+    window.__jquery("#__definition__").empty().append([originDiv, transDiv]);
+  }
+
   function handleWordClick() {
     window.document.onclick = (e) => {
       if (e.target.tagName === "WORD" || e.target.tagName === "word") {
         lookup(e.target.textContent);
+      }
+      if (e.target.className === "__sentence_count__") {
+        const parentEl = e.target.parentElement;
+        if (!parentEl || parentEl.className !== "__subtitle_sentence__") return;
+        const s = Array.from(parentEl.childNodes)
+          .slice(1)
+          .map((node) =>
+            node.nodeName === "#text" ? node.textContent : node.innerText
+          )
+          .join("");
+        translateByGoogle(s);
       }
     };
   }
@@ -376,9 +399,9 @@ export default function () {
   async function main() {
     // console.log("dict json::: ", ipcRenderer.invoke('get-dict-files'))
     initJquery();
-    handleWordClick()
+    handleWordClick();
     // handleDictInputListener();
-    const dictFiles = await ipcRenderer.invoke('get-dict-files');
+    const dictFiles = await ipcRenderer.invoke("get-dict-files");
     initDictData(dictFiles);
     // if (inited) return;
     let cachedSubtitleData = window.localStorage.getItem("__subtitles_data__");
