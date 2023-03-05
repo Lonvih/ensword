@@ -1,9 +1,9 @@
 <p align="center">
   <img width="170" style="border-radius: 4px;" src="https://www.webwise.ie/wp-content/uploads/2014/04/Slider8.jpg" />
 </p>
-<div align="center">
-  <h1>ENSWORD</h1>
-</div>
+
+## ENSWORD
+There are tens of thousands of videos on YouTube. As a non-native English speaker, one can not only learn English from videos that interest them but also gain knowledge in various fields. This is a really cool thing. So, I developed this client as a learning aid.
 
 ## Features
 - ✨ `mdx/mdd` file parse, translate english to target language.
