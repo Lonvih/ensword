@@ -43,8 +43,19 @@ const indexHtml = join(process.env.DIST, 'index.html')
 let inited = false;
 
 function registryShotCut() {
+  win.on('blur', () => {
+    globalShortcut.unregisterAll()
+  })
+  win.on('focus', () => {
+    shotCutRegist();
+  })
   if (inited) return;
   inited = true;
+  shotCutRegist();
+}
+
+function shotCutRegist() {
+  if (globalShortcut.isRegistered('CommandOrControl+Left')) return;
   globalShortcut.register('CommandOrControl+Left', () => {
     win.webContents.goBack()
   })

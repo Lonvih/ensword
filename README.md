@@ -10,6 +10,11 @@ There are tens of thousands of videos on YouTube. As a non-native English speake
 - ✨ Parse YouTuBe video subtitle data.
 - ✨ Google translation.
 
+## Shotcut
+
+- Browser back: `CMD + Left`(Mac) or `ctrl + Left`(Win)  
+- Browser forward: `CMD + Right`(Mac) or `ctrl + Right`(Win)  
+
 ## Build
 - `npm i`
 - `npm run build`
