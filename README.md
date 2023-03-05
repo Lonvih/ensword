@@ -10,6 +10,10 @@
 - ✨ Parse YouTuBe video subtitle data.
 - ✨ Google translation.
 
+## Build
+- `npm i`
+- `npm run build`
+
 ## Preview
 ![ppE7fZn.md.png](https://s1.ax1x.com/2023/03/05/ppE7fZn.md.png)
 <img width="1000" style="border-radius: 4px;" src="./preview.gif" />
