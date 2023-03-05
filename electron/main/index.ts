@@ -1,4 +1,4 @@
-import { app, BrowserWindow, BrowserView, shell, ipcMain, screen, contextBridge } from 'electron'
+import { app, BrowserWindow, shell, ipcMain, screen, globalShortcut } from 'electron'
 import { release } from 'node:os'
 import { join } from 'node:path'
 import { eventInit } from './events'
@@ -40,6 +40,18 @@ let win: BrowserWindow | null = null
 const preload = join(__dirname, '../preload/index.js')
 const url = process.env.VITE_DEV_SERVER_URL
 const indexHtml = join(process.env.DIST, 'index.html')
+let inited = false;
+
+function registryShotCut() {
+  if (inited) return;
+  inited = true;
+  globalShortcut.register('CommandOrControl+Left', () => {
+    win.webContents.goBack()
+  })
+  globalShortcut.register('CommandOrControl+Right', () => {
+    win.webContents.goForward()
+  })
+}
 
 async function createWindow(targetUrl?: string) {
   const primaryDisplay = screen.getPrimaryDisplay()
@@ -88,11 +100,11 @@ async function createWindow(targetUrl?: string) {
     if (url.startsWith('https:')) shell.openExternal(url)
     return { action: 'deny' }
   })
-
+  registryShotCut();
   eventInit()
 }
 
-app.whenReady().then(createWindow)
+app.whenReady().then(() => createWindow())
 
 app.on('window-all-closed', () => {
   win = null
@@ -118,7 +130,6 @@ app.on('activate', () => {
 
 let dictFiles = []
 ipcMain.on("loadYouTuBe", (_, data) => {
-  console.log("load ====> ", data)
   if (data) {
     // let fileList = JSON.stringify(data)
     // dicts.setPaths(data)
