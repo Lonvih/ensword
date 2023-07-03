@@ -182,6 +182,7 @@ export default function () {
   }
 
   function videoListenerFn(e) {
+    handleWholeSubtitlesStyle()
     const currentTimeMs = videoEl.currentTime * 1000;
     const matchSubtitleIndex = findIndexMatchVideoTime(currentTimeMs);
     if (curSubtitleDataIndex !== matchSubtitleIndex) {
@@ -240,11 +241,34 @@ export default function () {
     }
   }
 
+  function handleWholeSubtitlesStyle() {
+    const wholeSubtitleEl = document.querySelector(".__whole_subtitles");
+    if (wholeSubtitleEl) {
+      const subtitleDoms = wholeSubtitleEl.querySelectorAll('.__subtitle_sentence__')
+      const currentTimeMs = videoEl.currentTime * 1000;
+      let targetDom = null;
+      Array.from(subtitleDoms).some((item, index) => {
+        const domMs = item.getAttribute('startms')
+        if (domMs <= currentTimeMs) {
+          targetDom = item;
+        }
+        return domMs && parseInt(domMs) > currentTimeMs
+      })
+      // 删除上次新增的 class
+      const activeDom = document.querySelector('.__subtitle_sentence__active__')
+      activeDom && activeDom.classList.remove('__subtitle_sentence__active__')
+      targetDom && targetDom.classList.add('__subtitle_sentence__active__')
+    }
+  }
+
   function displayWholeSubtitleIndividual() {
     isDisplayWholeSubtitle = !isDisplayWholeSubtitle;
     const wholeSubtitleEl = document.querySelector(".__whole_subtitles");
     if (wholeSubtitleEl) {
       wholeSubtitleEl.style.display = isDisplayWholeSubtitle ? "block" : "none";
+      setTimeout(() => {
+        handleWholeSubtitlesStyle()
+      }, 100);
       if (!wholeSubtitleEl.innerHTML || videoChanged) {
         // insert subtitles to el
         let isSentenceProcessing = false;
@@ -252,7 +276,8 @@ export default function () {
         let num = 0;
         let total = 0;
         const DIV_PREFIX =
-          "<div class='__subtitle_sentence__'><span class='__sentence_count__'>${num}/${total}</span>";
+          "<div class='__subtitle_sentence__' startms=${ms}><span class='__sentence_count__'>${num}/${total}</span>";
+        const len = subtitleData.length;
         let wholeSubtitleText = subtitleData
           .map((item, index) => {
             const { segs = [] } = item;
@@ -271,11 +296,17 @@ export default function () {
             // } else if (/[“"]/.test(t) && !/”/.test(t) && (t.match(/[“"]/g).length % 2) > 0) {
             //   isQuote = true;
             // }
+            const isLast = index === len -1;
+            let prefix = '';
+            if (!isLast) {
+              const { tStartMs } = subtitleData[index + 1];
+              prefix = DIV_PREFIX.replace('${ms}', tStartMs + '')
+            }
             let sentenceEndReg =
               /(\w(?<!Mr))(<\/word>)?(\.{1,}|\!|\?)("?)([^\d\<]?)/gi;
             const r = t.replace(
               sentenceEndReg,
-              `$1$2$3$4$5</div>${DIV_PREFIX}`
+              `$1$2$3$4$5</div>${!isLast ? prefix : ''}`
             );
             // const isLastSentence = /\w\.?(\.|\!|\?|”|")$/i.test(t);
             // if (isLastSentence && !isQuote) {
@@ -288,7 +319,7 @@ export default function () {
           })
           .join(" ");
         if (wholeSubtitleText) {
-          wholeSubtitleText = DIV_PREFIX + wholeSubtitleText;
+          wholeSubtitleText = DIV_PREFIX.replace('${ms}', '0') + wholeSubtitleText;
         }
         const m = wholeSubtitleText.match(/\${num}/g);
         if (m) {
@@ -354,6 +385,7 @@ export default function () {
   }
 
   function translateByGoogle(str) {
+    str = str.replace(';', ',')
     fetch(
       `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=zh-CN&dt=t&dj=1&q=${str}`
     ).then(async (res) => {

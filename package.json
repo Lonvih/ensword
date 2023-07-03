@@ -1,5 +1,5 @@
 {
-  "name": "ensword",
+  "name": "enofsword",
   "version": "1.0.0",
   "main": "dist-electron/main/index.js",
   "description": "Integrate mdict into youtube, use for english learning.",
@@ -39,7 +39,6 @@
   "dependencies": {
     "@ant-design/icons": "^5.0.1",
     "antd": "^5.2.2",
-    "cheerio": "^1.0.0-rc.12",
     "jsdom": "^21.1.0"
   }
 }
