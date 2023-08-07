@@ -110,7 +110,7 @@ function appendSubtitlesContainer(data2String) {
     // setStyle(addThirdEl, "width: 100px;");
     // colsEl.appendChild(addThirdEl);
   }
-  secondaryEl.appendChild(container);
+  secondaryEl.insertBefore(container, secondaryEl.children[0]);
   resizeVideoStyle();
   controller();
   injected = true;

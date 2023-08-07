@@ -3,6 +3,8 @@ import MRenderer from "../main/mdict/mdict-renderer";
 import jquery from "../main/mdict/jquery.js";
 import { ipcRenderer } from "electron";
 
+const TRANSLATE_ICON_CLS = '__translate_icon__'
+
 let isControllerInit = false;
 class Queue {
   queue = [];
@@ -245,30 +247,55 @@ export default function () {
     const wholeSubtitleEl = document.querySelector(".__whole_subtitles");
     if (wholeSubtitleEl) {
       const subtitleDoms = wholeSubtitleEl.querySelectorAll('.__subtitle_sentence__')
+      
       const currentTimeMs = videoEl.currentTime * 1000;
       let targetDom = null;
+      let targetIdx = 0;
       Array.from(subtitleDoms).some((item, index) => {
         const domMs = item.getAttribute('startms')
         if (domMs <= currentTimeMs) {
           targetDom = item;
+          targetIdx = index
         }
         return domMs && parseInt(domMs) > currentTimeMs
       })
       // 删除上次新增的 class
       const activeDom = document.querySelector('.__subtitle_sentence__active__')
       activeDom && activeDom.classList.remove('__subtitle_sentence__active__')
-      targetDom && targetDom.classList.add('__subtitle_sentence__active__')
+      if (targetDom) {
+        targetDom.classList.add('__subtitle_sentence__active__')
+        // Display current/prev/next whole sentence in control panel
+        // Why display three sentence: Current highlight sentence may not exactly correct
+        const idxs = [targetIdx - 1, targetIdx, targetIdx + 1].filter(d => d >= 0);
+        const finalHtml = idxs.reduce((html, idx) => {
+          let dom = subtitleDoms[idx]
+          const isActiveDom = dom === targetDom
+          const sentenceCls = isActiveDom ? '__active_whole_current_sentence__' : ''
+          if (dom) {
+            html += `<div class="__whole_current_sentence__ ${sentenceCls}"><img class="${TRANSLATE_ICON_CLS}" src="https://s1.ax1x.com/2023/08/07/pPEZqd1.png" />${dom.innerHTML.replace(/<span.+\/span>/, '')}</div>`
+          }
+          return html
+        }, '')
+        document.querySelector('#__current_subtitle__').innerHTML = finalHtml;
+      }
     }
   }
 
   function displayWholeSubtitleIndividual() {
     isDisplayWholeSubtitle = !isDisplayWholeSubtitle;
+    setTimeout(() => {
+      handleWholeSubtitlesStyle()
+    }, 100);
+    parseSubtitlesIntoSentence((wholeSubtitleEl) => {
+      wholeSubtitleEl.style.display = isDisplayWholeSubtitle ? "block" : "none";
+    })
+  }
+
+  function parseSubtitlesIntoSentence(fn) {
     const wholeSubtitleEl = document.querySelector(".__whole_subtitles");
     if (wholeSubtitleEl) {
-      wholeSubtitleEl.style.display = isDisplayWholeSubtitle ? "block" : "none";
-      setTimeout(() => {
-        handleWholeSubtitlesStyle()
-      }, 100);
+      fn && fn(wholeSubtitleEl)
+      
       if (!wholeSubtitleEl.innerHTML || videoChanged) {
         // insert subtitles to el
         let isSentenceProcessing = false;
@@ -357,6 +384,7 @@ export default function () {
     };
     repeat.onclick = () => repeatSentence(repeat);
     displayWholeSubtitleIcon.onclick = displayWholeSubtitleIndividual;
+    parseSubtitlesIntoSentence()
   }
 
   function initDictData(fileList) {
@@ -414,9 +442,9 @@ export default function () {
       if (e.target.tagName === "WORD" || e.target.tagName === "word") {
         lookup(e.target.textContent);
       }
-      if (e.target.className === "__sentence_count__") {
+      if (e.target.className === TRANSLATE_ICON_CLS) {
         const parentEl = e.target.parentElement;
-        if (!parentEl || parentEl.className !== "__subtitle_sentence__") return;
+        if (!parentEl || !parentEl.className.includes("__whole_current_sentence__ ")) return;
         const s = Array.from(parentEl.childNodes)
           .slice(1)
           .map((node) =>

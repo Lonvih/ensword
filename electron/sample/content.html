@@ -18,11 +18,11 @@
   }
 
   .__video_subitles {
-    position: absolute;
-    left: 0;
-    top: 24px;
+    /* position: absolute; */
+    /* left: 0;
+    top: 24px; */
     width: 100%;
-    /* min-height: 700px; */
+    min-height: 500px;
     z-index: 1200;
     padding: 12px;
     border-radius: 12px;
@@ -133,17 +133,47 @@
   }
 
   #__definition__ {
-    position: absolute;
-    top: calc(100% + 8px);
+    /* position: absolute; */
+    /* top: calc(100% + 8px);
     left: 0;
     right: 0;
     width: 40vw;
-    height: 400px;
+    height: 400px; */
+    width: 100%;
+    max-height: 500px;
     padding: 12px;
     border-radius: 4px;
     overflow: scroll;
     font-size: 14px;
     background-color: #fff;
+  }
+
+  .__line {
+    width: 100%;
+    margin: 16px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.6);
+  }
+
+  #__current_subtitle__ {
+    width: 100%;
+    font-size: 16px;
+    /* font-weight: bold; */
+    color: rgba(255, 255, 255, 0.6);
+    /* color:rgb(153, 225, 156) !important; */
+  }
+
+  .__whole_current_sentence__ {
+    margin-bottom: 8px;
+  }
+  .__translate_icon__ {
+    width: 22px;
+    height: 22px;
+    border-radius: 2px;
+    margin-right: 8px;
+    /* line-height: 16px; */
+  }
+  #__current_subtitle__ .__active_whole_current_sentence__ {
+    color:rgb(153, 225, 156) !important;
   }
 </style>
 <img
@@ -165,5 +195,7 @@
   </div>
   <div class="__subtitles_content"></div>
   <div class="__whole_subtitles"></div>
+  <div class="__line"></div>
+  <div id="__current_subtitle__"></div>
   <div id="__definition__"></div>
 </div>
