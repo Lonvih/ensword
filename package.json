@@ -1,6 +1,6 @@
 {
-  "name": "enofsword",
-  "version": "1.0.0",
+  "name": "ensword",
+  "version": "1.0.1",
   "main": "dist-electron/main/index.js",
   "description": "Integrate mdict into youtube, use for english learning.",
   "author": "rohye <rohy.froze@gmail.com>",
