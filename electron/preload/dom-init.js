@@ -42,7 +42,7 @@ function resizeVideoStyle() {
   if (!videoContainer || !video || !bottomCtrl) return;
   setStyle(videoContainer, "height: 100%");
   setStyle(video, "width: 100%; height: 100%;");
-  setStyle(bottomCtrl, "width: calc(100% - 12px); left: 12px;");
+  setStyle(bottomCtrl, "width: calc(100% - 24px); left: 12px;");
   setStyle(secondaryEl, "width: auto;")
   // setStyle(progressBarParent, "width: 100% !important;")
 }
